@@ -1,0 +1,172 @@
+{% extends 'expenses/base.html' %}
+{% block title %}Add Transaction - Budget Pro{% endblock %}
+
+{% block content %}
+<!-- Main container for the add transaction form -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Card container for the form -->
+        <div class="card shadow">
+            <!-- Card header with title -->
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-plus-circle me-2"></i>
+                <h3 class="mb-0">Add New Transaction</h3>
+            </div>
+            
+            <!-- Card body containing the transaction form -->
+            <div class="card-body">
+                <form method="post" class="form-container" id="transactionForm">
+                    {% csrf_token %}
+                    
+                    <!-- Transaction title input -->
+                    <div class="mb-4">
+                        <label for="title" class="form-label">Title *</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-heading"></i></span>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Enter transaction title" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Transaction amount input -->
+                    <div class="mb-4">
+                        <label for="amount" class="form-label">Amount *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Transaction type and category selection -->
+                    <div class="row">
+                        <!-- Transaction type dropdown -->
+                        <div class="col-md-6 mb-4">
+                            <label for="transaction_type" class="form-label">Type *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-exchange-alt"></i></span>
+                                <select class="form-select" id="transaction_type" name="transaction_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="income">Income</option>
+                                    <option value="expense">Expense</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Category dropdown (filtered by transaction type) -->
+                        <div class="col-md-6 mb-4">
+                            <label for="category" class="form-label">Category *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tags"></i></span>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}" data-type="{{ category.transaction_type }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Date and time inputs -->
+                    <div class="row">
+                        <!-- Date input -->
+                        <div class="col-md-6 mb-4">
+                            <label for="date" class="form-label">Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                <input type="date" class="form-control" id="date" name="date">
+                            </div>
+                        </div>
+                        
+                        <!-- Time input -->
+                        <div class="col-md-6 mb-4">
+                            <label for="time" class="form-label">Time</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                                <input type="time" class="form-control" id="time" name="time">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Description textarea -->
+                    <div class="mb-4">
+                        <label for="description" class="form-label">Description</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter transaction description"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit and cancel buttons -->
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus-circle me-2"></i>Add Transaction
+                        </button>
+                        <a href="{% url 'transaction_history' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Get references to the transaction type and category select elements
+    const transactionTypeSelect = document.getElementById('transaction_type');
+    const categorySelect = document.getElementById('category');
+    
+    // Store original category options for filtering
+    const originalCategories = Array.from(categorySelect.options);
+    
+    /**
+     * Function to filter categories based on transaction type
+     * @param {string} transactionType - The selected transaction type (income/expense)
+     */
+    function filterCategories(transactionType) {
+        // Clear current options except the default "Select Category" option
+        categorySelect.innerHTML = '<option value="">Select Category</option>';
+        
+        // Add only categories that match the transaction type
+        originalCategories.forEach(option => {
+            if (option.value === '' || option.dataset.type === transactionType) {
+                const newOption = option.cloneNode(true);
+                categorySelect.appendChild(newOption);
+            }
+        });
+    }
+    
+    // Event listener for transaction type change to update category dropdown
+    transactionTypeSelect.addEventListener('change', function() {
+        filterCategories(this.value);
+    });
+    
+    // Also add AJAX version for dynamic loading (optional enhancement)
+    /*
+    transactionTypeSelect.addEventListener('change', function() {
+        const transactionType = this.value;
+        if (transactionType) {
+            fetch(`/api/categories-by-type/?transaction_type=${transactionType}`)
+                .then(response => response.json())
+                .then(data => {
+                    categorySelect.innerHTML = '<option value="">Select Category</option>';
+                    data.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        categorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching categories:', error));
+        } else {
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+        }
+    });
+    */
+});
+</script>
+{% endblock %}

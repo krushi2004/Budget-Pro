@@ -1,0 +1,140 @@
+{% extends 'expenses/base.html' %}
+{% block title %}Edit Transaction - Budget Pro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-edit me-2"></i>
+                <h3 class="mb-0">Edit Transaction</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" class="form-container" id="transactionForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="title" class="form-label">Title *</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-heading"></i></span>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ transaction.title }}" placeholder="Enter transaction title" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="amount" class="form-label">Amount *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" value="{{ transaction.amount }}" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="transaction_type" class="form-label">Type *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-exchange-alt"></i></span>
+                                <select class="form-select" id="transaction_type" name="transaction_type" required>
+                                    <option value="income" {% if transaction.transaction_type == 'income' %}selected{% endif %}>Income</option>
+                                    <option value="expense" {% if transaction.transaction_type == 'expense' %}selected{% endif %}>Expense</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <label for="category" class="form-label">Category *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tags"></i></span>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if transaction.category.id == category.id %}selected{% endif %} data-type="{{ category.transaction_type }}">
+                                            {{ category.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="date" class="form-label">Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                <input type="date" class="form-control" id="date" name="date" value="{{ transaction.date|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <label for="time" class="form-label">Time</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                                <input type="time" class="form-control" id="time" name="time" value="{{ transaction.date|date:'H:i' }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="description" class="form-label">Description</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter transaction description">{{ transaction.description }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>Update Transaction
+                        </button>
+                        <a href="{% url 'transaction_history' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const transactionTypeSelect = document.getElementById('transaction_type');
+    const categorySelect = document.getElementById('category');
+    const originalCategories = Array.from(categorySelect.options);
+    
+    // Store the currently selected category ID
+    const selectedCategoryId = categorySelect.value;
+    
+    // Filter categories based on transaction type
+    function filterCategories(transactionType) {
+        // Store current selection
+        const currentSelection = categorySelect.value;
+        
+        // Clear current options
+        categorySelect.innerHTML = '<option value="">Select Category</option>';
+        
+        // Add only categories that match the transaction type
+        originalCategories.forEach(option => {
+            if (option.value === '' || option.dataset.type === transactionType) {
+                const newOption = option.cloneNode(true);
+                // Restore selection if it's still valid
+                if (option.value === currentSelection) {
+                    newOption.selected = true;
+                }
+                categorySelect.appendChild(newOption);
+            }
+        });
+    }
+    
+    // Initialize filtering based on current selection
+    filterCategories(transactionTypeSelect.value);
+    
+    // Event listener for transaction type change
+    transactionTypeSelect.addEventListener('change', function() {
+        filterCategories(this.value);
+    });
+});
+</script>
+{% endblock %}

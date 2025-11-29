@@ -1,0 +1,168 @@
+{% extends 'expenses/base.html' %}
+{% block title %}Profile - Budget Pro{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-circle me-2"></i>
+                    <h3 class="mb-0">User Profile</h3>
+                </div>
+                <button type="submit" form="profileForm" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Update Profile
+                </button>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="profileForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-4 mb-4">
+                            <div class="text-center">
+                                <div class="position-relative d-inline-block">
+                                    {% if profile.profile_picture %}
+                                        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid border border-3 border-primary" style="width: 200px; height: 200px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light border border-3 border-primary" style="width: 200px; height: 200px;">
+                                            <i class="fas fa-user fa-3x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div class="position-absolute bottom-0 end-0">
+                                        <label for="profile_picture" class="btn btn-primary rounded-circle p-2 shadow" style="cursor: pointer;">
+                                            <i class="fas fa-camera"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <input type="file" class="form-control d-none" id="profile_picture" name="profile_picture" accept="image/*">
+                                    <p class="text-muted small">Click the camera icon to change your profile picture</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-8">
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="first_name" class="form-label">Full Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" placeholder="Enter your full name">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="username" class="form-label">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" placeholder="Enter username">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="email" class="form-label">Email</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" placeholder="Enter email address" readonly>
+                                        <span class="input-group-text bg-light text-muted" title="Email cannot be changed"><i class="fas fa-lock"></i></span>
+                                    </div>
+                                    <small class="text-muted">Email cannot be changed for security reasons</small>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="phone_number" class="form-label">Mobile Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ profile.phone_number }}" placeholder="Enter phone number">
+                                    </div>
+                                    {% if profile.phone_number %}
+                                        <small class="text-success">Verified <i class="fas fa-check-circle"></i></small>
+                                    {% else %}
+                                        <small class="text-muted">
+                                            Add your phone number and save to enable verification
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="occupation" class="form-label">Occupation</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                        <input type="text" class="form-control" id="occupation" name="occupation" value="{{ profile.occupation }}" placeholder="Enter occupation">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                        <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ profile.date_of_birth|date:'Y-m-d' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mt-4">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-info-circle me-2"></i>
+                <h5 class="mb-0">Account Information</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-plus me-2 text-primary"></i> Member since</span>
+                        <span class="badge bg-primary rounded-pill">{{ user.date_joined|date:"F d, Y" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-clock me-2 text-primary"></i> Last login</span>
+                        <span class="badge bg-primary rounded-pill">{{ user.last_login|date:"F d, Y H:i" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-file-invoice me-2 text-primary"></i> Total Transactions</span>
+                        <span class="badge bg-primary rounded-pill">{{ user.transaction_set.count }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Make the camera icon clickable to trigger file input
+    const cameraBtn = document.querySelector('.btn-primary.rounded-circle');
+    const fileInput = document.getElementById('profile_picture');
+    
+    cameraBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        fileInput.click();
+    });
+    
+    // Preview image when selected
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const profileImg = document.querySelector('.rounded-circle img');
+                if (profileImg) {
+                    profileImg.src = e.target.result;
+                } else {
+                    // Replace the default icon with the image
+                    const imgContainer = document.querySelector('.rounded-circle');
+                    imgContainer.innerHTML = `<img src="${e.target.result}" alt="Profile Picture" class="rounded-circle img-fluid border border-3 border-primary" style="width: 200px; height: 200px; object-fit: cover;">`;
+                }
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+});
+</script>
+{% endblock %}

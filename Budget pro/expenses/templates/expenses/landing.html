@@ -1,0 +1,46 @@
+{% extends 'expenses/base.html' %}
+{% block title %}Budget Pro - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-primary text-white rounded-3 p-5 mb-4">
+    <div class="container">
+        <h1 class="display-4">Budget Pro</h1>
+        <p class="lead">Track your expenses, manage your budget, and achieve your financial goals.</p>
+        <hr class="my-4">
+        <p>Join thousands of users who are taking control of their finances with our easy-to-use expense tracker.</p>
+        <div class="mt-4">
+            <a class="btn btn-light btn-lg me-2" href="{% url 'signup' %}" role="button">Get Started</a>
+            <a class="btn btn-outline-light btn-lg" href="{% url 'about' %}" role="button">Learn More</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Track Expenses</h5>
+                    <p class="card-text">Easily record and categorize your daily expenses to understand where your money goes.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Visual Reports</h5>
+                    <p class="card-text">Get insightful charts and graphs to visualize your spending patterns and trends.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Financial Goals</h5>
+                    <p class="card-text">Set budgets and track your progress toward achieving your financial objectives.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

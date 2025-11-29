@@ -1,0 +1,62 @@
+{% extends 'expenses/base.html' %}
+{% block title %}Verify Email - Budget Pro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center justify-content-center">
+                <i class="fas fa-envelope me-2"></i>
+                <h3 class="mb-0">Verify Your Email</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    Enter the 6-digit verification code sent to your email address.
+                </p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            {{ form.email }}
+                        </div>
+                        {% if form.email.help_text %}
+                            <div class="form-text">{{ form.email.help_text }}</div>
+                        {% endif %}
+                        {% if form.email.errors %}
+                            <div class="text-danger">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.otp.id_for_label }}" class="form-label">Verification Code</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                            {{ form.otp }}
+                        </div>
+                        {% if form.otp.help_text %}
+                            <div class="form-text">{{ form.otp.help_text }}</div>
+                        {% endif %}
+                        {% if form.otp.errors %}
+                            <div class="text-danger">{{ form.otp.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-check-circle me-2"></i>Verify Email
+                    </button>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <p>Didn't receive the code? <a href="{% url 'resend_verification' %}">Resend</a></p>
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

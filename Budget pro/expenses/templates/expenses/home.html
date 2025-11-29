@@ -1,0 +1,344 @@
+{% extends 'expenses/base.html' %}
+{% block title %}Dashboard - Budget Pro{% endblock %}
+
+{% block content %}
+<!-- Summary cards section showing balance, income, and expenses -->
+<div class="row">
+    <!-- Total Balance Card -->
+    <div class="col-md-4">
+        <div class="card summary-card shadow-lg">
+            <div class="card-body text-center">
+                <div class="d-flex justify-content-center mb-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                        <i class="fas fa-wallet fa-2x text-primary"></i>
+                    </div>
+                </div>
+                <h5 class="card-title">Total Balance</h5>
+                <h3 class="summary-amount {% if balance >= 0 %}balance-positive{% else %}balance-negative{% endif %}">
+                    ${{ balance|floatformat:2 }}
+                </h3>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Income Card -->
+    <div class="col-md-4">
+        <div class="card summary-card shadow-lg">
+            <div class="card-body text-center">
+                <div class="d-flex justify-content-center mb-3">
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                        <i class="fas fa-arrow-circle-down fa-2x text-success"></i>
+                    </div>
+                </div>
+                <h5 class="card-title">Total Income</h5>
+                <h3 class="summary-amount balance-positive">₹{{ total_income|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Expenses Card -->
+    <div class="col-md-4">
+        <div class="card summary-card shadow-lg">
+            <div class="card-body text-center">
+                <div class="d-flex justify-content-center mb-3">
+                    <div class="rounded-circle bg-danger bg-opacity-10 p-3">
+                        <i class="fas fa-arrow-circle-up fa-2x text-danger"></i>
+                    </div>
+                </div>
+                <h5 class="card-title">Total Expenses</h5>
+                <h3 class="summary-amount balance-negative">₹{{ total_expenses|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row mt-4">
+    <!-- Income vs Expenses Pie Chart -->
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-chart-pie me-2"></i>
+                <h5 class="mb-0">Income vs Expenses</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="incomeExpenseChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Expenses by Category Pie Chart -->
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-chart-bar me-2"></i>
+                <h5 class="mb-0">Expenses by Category</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Overview Bar Chart -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-chart-line me-2"></i>
+                <h5 class="mb-0">Monthly Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions and Top Expense Categories Section -->
+<div class="row mt-4">
+    <!-- Recent Transactions Table -->
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-history me-2"></i>
+                <h5 class="mb-0">Recent Transactions</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_transactions %}
+                    <div class="table-responsive">
+                        <table class="table transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in recent_transactions %}
+                                    <tr class="transaction-card">
+                                        <td>{{ transaction.title }}</td>
+                                        <td>
+                                            {% if transaction.category %}
+                                                {% if transaction.category.color %}
+                                                    <span class="badge category-color" data-category-color="{{ transaction.category.color }}">
+                                                        {{ transaction.category.name }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">
+                                                        {{ transaction.category.name }}
+                                                    </span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">No Category</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if transaction.transaction_type == 'income' %}income-badge{% else %}expense-badge{% endif %}">
+                                                {% if transaction.transaction_type == 'expense' %}-{% endif %}₹{{ transaction.amount|floatformat:2 }}
+                                            </span>
+                                        </td>
+                                        <td>{{ transaction.date|date:"M d, Y" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No transactions yet</h5>
+                        <p class="text-muted">Start tracking your finances by adding your first transaction.</p>
+                        <a href="{% url 'add_transaction' %}" class="btn btn-primary">Add Transaction</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Expense Categories List -->
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-tags me-2"></i>
+                <h5 class="mb-0">Top Expense Categories</h5>
+            </div>
+            <div class="card-body">
+                {% if expense_categories %}
+                    <ul class="list-group list-group-flush">
+                        {% for category in expense_categories %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center transaction-card">
+                                <span>
+                                    {% if category.color %}
+                                        <span class="badge me-2 category-color" data-category-color="{{ category.color }}">&nbsp;</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary me-2">&nbsp;</span>
+                                    {% endif %}
+                                    {{ category.name }}
+                                </span>
+                                <span class="badge bg-secondary rounded-pill">₹{{ category.total|floatformat:2 }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-tag fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">No expense categories yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-bolt me-2"></i>
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body text-center">
+                <a href="{% url 'add_transaction' %}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-plus-circle me-2"></i>Add Transaction
+                </a>
+                <a href="{% url 'transaction_history' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-list me-2"></i>View All Transactions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Fetch chart data from the API endpoint
+fetch('{% url "chart_data" %}')
+    .then(response => response.json())
+    .then(data => {
+        // Income vs Expense Pie Chart
+        const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+        new Chart(incomeExpenseCtx, {
+            type: 'pie',
+            data: {
+                labels: data.income_expense.labels,
+                datasets: [{
+                    data: data.income_expense.data,
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',  // Green for income
+                        'rgba(220, 53, 69, 0.8)'   // Red for expenses
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(220, 53, 69, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Expenses by Category Pie Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'pie',
+            data: {
+                labels: data.expense_by_category.labels,
+                datasets: [{
+                    data: data.expense_by_category.data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 205, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Monthly Bar Chart
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: data.monthly.labels,
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: data.monthly.income,
+                        backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Expenses',
+                        data: data.monthly.expenses,
+                        backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    })
+    .catch(error => console.error('Error fetching chart data:', error));
+</script>
+{% endblock %}

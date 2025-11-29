@@ -1,0 +1,55 @@
+{% extends 'expenses/base.html' %}
+{% block title %}Delete Transaction - Budget Pro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>Delete Transaction</h3>
+            </div>
+            <div class="card-body">
+                <p>Are you sure you want to delete the following transaction?</p>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ transaction.title }}</h5>
+                        <p class="card-text">
+                            <strong>Amount:</strong> 
+                            <span class="{% if transaction.transaction_type == 'expense' %}text-danger{% else %}text-success{% endif %}">
+                                {% if transaction.transaction_type == 'expense' %}-{% endif %}₹{{ transaction.amount|floatformat:2 }}
+                            </span>
+                        </p>
+                        <p class="card-text">
+                            <strong>Type:</strong> 
+                            <span class="badge {% if transaction.transaction_type == 'income' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ transaction.transaction_type|title }}
+                            </span>
+                        </p>
+                        <p class="card-text">
+                            <strong>Category:</strong> 
+                            {% if transaction.category %}
+                                <span class="badge" {% if transaction.category.color %}style="background-color: {{ transaction.category.color }};"{% else %}style="background-color: #6c757d;"{% endif %}>
+                                    {{ transaction.category.name }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">No Category</span>
+                            {% endif %}
+                        </p>
+                        <p class="card-text"><strong>Date:</strong> {{ transaction.date|date:"F d, Y" }}</p>
+                        {% if transaction.description %}
+                            <p class="card-text"><strong>Description:</strong> {{ transaction.description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <a href="{% url 'transaction_history' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

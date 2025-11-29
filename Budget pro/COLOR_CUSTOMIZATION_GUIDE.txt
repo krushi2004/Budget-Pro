@@ -1,0 +1,94 @@
+COLOR CUSTOMIZATION GUIDE FOR BUDGET PRO
+=====================================
+
+This guide will help you easily change colors and styling in the Budget Pro application.
+
+EASY COLOR CUSTOMIZATION
+========================
+
+All colors are defined as CSS variables in the :root section at the top of the CSS file.
+To change the entire theme, you only need to modify these variables:
+
+FILE TO MODIFY:
+c:\Budget pro\expenses\static\expenses\css\style.css
+
+LOCATION OF VARIABLES:
+Lines 1-21 contain all color variables in the :root section
+
+AVAILABLE VARIABLES:
+-------------------
+--primary-dark:     Main dark color (navbar, buttons, card headers)
+--primary-medium:   Medium blue for gradients
+--primary-light:    Light blue for gradients
+--primary-hover:    Color when hovering over buttons
+--success-dark:     Income/green color
+--success-light:    Light green for gradients
+--danger:          Expense/red color
+--warning:         Warning/orange color
+--text-dark:       Dark text color
+--text-light:      Light/white text color
+--shadow-primary:  Primary shadow color
+--shadow-primary-light: Light primary shadow
+--shadow-dark:     Dark shadow
+--shadow-darker:   Darker shadow
+
+HOW TO CHANGE COLORS:
+====================
+
+1. Open the file:
+   c:\Budget pro\expenses\static\expenses\css\style.css
+
+2. Go to lines 1-21 to find the :root section
+
+3. Change any color value you want. For example:
+   
+   To change to a green theme:
+   --primary-dark: #2c3e50;    →   --primary-dark: #27ae60;
+   --primary-medium: #1a2a6c;  →   --primary-medium: #2ecc71;
+   --primary-light: #2a4b8d;   →   --primary-light: #1abc9c;
+   
+   To change to a purple theme:
+   --primary-dark: #2c3e50;    →   --primary-dark: #8e44ad;
+   --primary-medium: #1a2a6c;  →   --primary-medium: #9b59b6;
+   --primary-light: #2a4b8d;   →   --primary-light: #9b59b6;
+
+4. Save the file
+
+5. Refresh your browser to see the changes
+
+EXAMPLE THEMES:
+==============
+
+GREEN THEME:
+--primary-dark: #27ae60;
+--primary-medium: #2ecc71;
+--primary-light: #1abc9c;
+--primary-hover: #219653;
+
+PURPLE THEME:
+--primary-dark: #8e44ad;
+--primary-medium: #9b59b6;
+--primary-light: #9b59b6;
+--primary-hover: #7d3c98;
+
+RED THEME:
+--primary-dark: #c0392b;
+--primary-medium: #e74c3c;
+--primary-light: #e74c3c;
+--primary-hover: #a93226;
+
+BLUE THEME:
+--primary-dark: #2980b9;
+--primary-medium: #3498db;
+--primary-light: #3498db;
+--primary-hover: #1f618d;
+
+TIPS:
+=====
+1. Use hex color codes (#RRGGBB format)
+2. Use https://www.color-hex.com/ to find color codes
+3. Make sure text remains readable against backgrounds
+4. Test changes by refreshing your browser
+5. Backup the original file before making changes
+
+The changes will automatically apply to all elements in the application because they all use these CSS variables.
